@@ -22,6 +22,83 @@ namespace EFCoreNortwind.Controllers
             _db = db;
         }
 
+        public IActionResult ChangeTrackerView()
+        {
+
+            //var product = _db.Products.AsNoTracking().FirstOrDefault(x => x.ProductId == 1);
+
+            /*_db.ChangeTracker.Entries();*/ // tüm entity ve state değişimlerini dizi olarak verir.
+
+            //foreach (var item in _db.ChangeTracker.Entries())
+            //{
+            //    if(item.State == EntityState.Added)
+            //    {
+
+            //    }
+            //}
+
+            //var state1 = _db.Entry(product).State;
+
+            //product.UnitPrice = 32;
+
+            //var state2 = _db.Entry(product).State;
+
+            //_db.Products.Update(product);
+            //_db.SaveChanges();
+
+            //var state3 = _db.Entry(product).State;
+
+
+            // Disconnected Remove Operation
+
+            // 1. yöntem (Attach ile silinecek olan nesneyi db Bağlar state değiştiririz)
+            //Category cat3 = new Category();
+            //cat3.CategoryId = 1009;
+
+            //_db.Attach(cat3).State = EntityState.Deleted; // EF 6 da bu şekilde Attach etmek zorundaydık.
+            //_db.SaveChanges();
+
+            // 2. yöntem remove methodu ile silme
+            //Category cat4 = new Category();
+            //cat4.CategoryId = 1010;
+            //_db.Remove(cat4);
+
+            // ekleme için 1 yöntem
+            //var category5 = new Category();
+            //category5.CategoryName = "Yeni";
+
+            //_db.Attach(category5).State = EntityState.Added;
+            //_db.SaveChanges();
+
+            // ekleme için 2 yöntem olan yöntem ile ekleme Add method connected gibi ekleyebiliriz.
+            //var category6 = new Category();
+            //category6.CategoryName = "Yeni kategori 6";
+
+            //_db.Add(category6);
+            //_db.SaveChanges();
+
+            // Günceleme işleminde ise 1. yöntem
+
+            //var category7 = new Category();
+            //category7.CategoryId = 1011;
+            //category7.CategoryName = "Yeni Güncel q4";
+            //_db.Attach(category7).State = EntityState.Modified;
+            //_db.SaveChanges();
+
+            // 2. yöntem ise
+
+            var category8 = new Category();
+            category8.CategoryId = 1013;
+            category8.CategoryName = "dsadsad34";
+
+            _db.Update<Category>(category8);
+            _db.SaveChanges();
+
+
+            return View();
+
+        }
+
         public IActionResult Index()
         {
             // sorgu1
@@ -30,11 +107,11 @@ namespace EFCoreNortwind.Controllers
             //sorgu1
            // iki tablo birbiri ile çoka çok ilişkili ise ara tablo üzerinden diğer tabloya ulşamak için thenInclude yaparız.
            // 1'e  çok ilişki varsa yada 1'1 ilişki varsa Include yeterlidir.
-            var pro1 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(p => p.Product).SelectMany(u => u.OrderDetails).GroupBy(c => c.ProductId).Select(y => new
-            {
-                ProductName = y.Key, // A
-                Quantity = y.Sum(z => z.Quantity) // 1200
-            }).OrderByDescending(c => c.Quantity).Take(5).ToList();
+            //var pro1 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(p => p.Product).SelectMany(u => u.OrderDetails).GroupBy(c => c.ProductId).Select(y => new
+            //{
+            //    ProductName = y.Key, // A
+            //    Quantity = y.Sum(z => z.Quantity) // 1200
+            //}).OrderByDescending(c => c.Quantity).Take(5).ToList();
 
             /*
              * SQL QUERY
@@ -64,22 +141,22 @@ order by adet desc
             // hangi müşteri hangi üründen kaç adet sipariş etti
             // çift alana göre group by işlemi
 
-            var query6 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(x => x.Product).Include(x => x.Customer).SelectMany(y => y.OrderDetails).GroupBy(y => new { y.Order.CustomerId, y.Product.ProductName}).Select(a => new
-            {
+            //var query6 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(x => x.Product).Include(x => x.Customer).SelectMany(y => y.OrderDetails).GroupBy(y => new { y.Order.CustomerId, y.Product.ProductName}).Select(a => new
+            //{
 
-                Product = a.Key.ProductName,
-                Customer = a.Key.CustomerId,
-                TotalProductQuantity = a.Sum(x => x.Quantity)
+            //    Product = a.Key.ProductName,
+            //    Customer = a.Key.CustomerId,
+            //    TotalProductQuantity = a.Sum(x => x.Quantity)
 
-            }).OrderByDescending(x=> x.TotalProductQuantity).ToList();
+            //}).OrderByDescending(x=> x.TotalProductQuantity).ToList();
 
             // hangi müşteri hangi kaç adet ürün sipariş etti
-            var query61 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(x => x.Product).Include(x => x.Customer).SelectMany(y => y.OrderDetails).GroupBy(y =>  y.Order.CustomerId).Select(a => new
-            {
-                Customer = a.Key,
-                TotalProductQuantity = a.Sum(x => x.Quantity)
+            //var query61 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(x => x.Product).Include(x => x.Customer).SelectMany(y => y.OrderDetails).GroupBy(y =>  y.Order.CustomerId).Select(a => new
+            //{
+            //    Customer = a.Key,
+            //    TotalProductQuantity = a.Sum(x => x.Quantity)
 
-            }).OrderByDescending(x=> x.TotalProductQuantity).ToList();
+            //}).OrderByDescending(x=> x.TotalProductQuantity).ToList();
 
             /*
              * 
@@ -112,31 +189,109 @@ inner  join Customers c on c.CustomerID = o.CustomerID
             // hangi çalışan kaç adet sipariş almış
 
 
-            var query12 = _db.Orders
-                .Include(x => x.Employee)
-                .GroupBy(x => new { x.Employee.FirstName, x.Employee.LastName }).Select(a => new
-                {
-                    EmployeeName = $"{a.Key.FirstName} {a.Key.LastName}",
-                    Count = a.Count()
+            //var query12 = _db.Orders
+            //    .Include(x => x.Employee)
+            //    .GroupBy(x => new { x.Employee.FirstName, x.Employee.LastName }).Select(a => new
+            //    {
+            //        EmployeeName = $"{a.Key.FirstName} {a.Key.LastName}",
+            //        Count = a.Count()
 
-                }).ToList();
+            //    }).ToList();
 
-            var qauery14 = _db.Orders.Include(x => x.Customer).Select(a => a.Customer.ContactName).ToList();
-            var qauery13 = _db.Orders.Select(a=> a.Customer.ContactName).ToList();
-            
+            //var qauery14 = _db.Orders.Include(x => x.Customer).Select(a => a.Customer.ContactName).ToList();
+            //var qauery13 = _db.Orders.Select(a=> a.Customer.ContactName).ToList();
 
-           
+
+
 
 
             // sorgu13
             // Hangi ürün hangi kategoride hangi tedarikçi tarafından getirilmiştir. KategoryAdı,UrunAdı,Fiyatı,Stoğu,Tedarikçi bilgileri ekrana getirilecek sorgu
 
+            var query13 = _db.Products.Include(x => x.Category).Include(x => x.Supplier).Select(a => new
+            {
+                ProductName = a.ProductName,
+                CategoryName = a.Category.CategoryName,
+                SupplierName = a.Supplier.ContactName,
+                UnitPrice = a.UnitPrice,
+                Stock = a.UnitsInStock
+
+            }).AsNoTracking();
+
+            // AsNoTracking toList veya firstOrDefault öncesinde kullanalım.
+            // ToList ve firstOrDefault IQuerable olarak işaretlenmiş sorgunun Sql düşmesine yani execute edilmesine neden olur.
+
+            // Not eğer sorgulama operasyonları yapıyorsak EF core bu sorgulananan nesnelerin her birini takip alıyor. buda performans kaybına yol açıyor. select işlemlerinde çok gereksiz bir durum. Sorgu performansını artırmak asNoTracking olarak işaretleyelim
+
+            //var product = _db.Products.Find("1"); // ChangeTracker ile direk program tarafında attached oluyor. yani üzerinden değişiklik yapılınca direk dbye gönderilebilir. // Attached
+            //product.UnitPrice = 2131; // Modified
+
+            //_db.Products.Update(product);
+            //_db.SaveChanges(); // detached
+
+            query13.ToList();
+
+
+
+            
+
+
+
+
+
+
+
+
+            //context.Entry<Student>(student).State = EntityState.Deleted;
+
+
+            // EF Core da Update methodu disconnected state çalışır bu sebeple AsNoTracking işaretlenen bir nesnenin değerini değiştirebiliriz.
+
+
             //sorgu14
             // en çok adet ürün sipariş edilen sipariş'in toplam tutarını bulalım
+
+            // Sql 
+            /*
+             * select MaxPriceOrderTableRecord.OrderTotalPrice from (select 
+                top 1
+                od.OrderID as 'OrderNumber',
+                SUM(od.Quantity) as 'OrderQuantity', 
+                SUM(od.Quantity * od.UnitPrice * (1-od.Discount))  as 'OrderTotalPrice'
+                from Orders o inner join [Order Details] od
+                on o.OrderID = od.OrderID 
+                group by od.OrderID
+                order by OrderQuantity desc) as MaxPriceOrderTableRecord
+             */
+            var query14 = _db.Orders.Include(x => x.OrderDetails).SelectMany(x => x.OrderDetails).GroupBy(x => x.OrderId).Select(a => new
+            {
+                OrderId = a.Key,
+                OrderQuantity = a.Sum(x => x.Quantity),
+                OrderTotalPrice = a.Sum(x => x.Quantity * x.UnitPrice * (decimal)(1 - x.Discount))
+
+            }).OrderByDescending(x => x.OrderQuantity).Take(1).FirstOrDefault().OrderTotalPrice;
+
 
             //sorgu15
             // en çok sipariş edilen ilk 5 ürünün toplam tutarını hesaplayalım
             // Urun Adı, Toplam Tutar şeklinde ekranda listelenecek.
+
+            var query15 = _db.Orders
+                .Include(x => x.OrderDetails)
+                .ThenInclude(x => x.Product)
+                .SelectMany(x => x.OrderDetails)
+                .GroupBy(x => x.Product.ProductName)
+                .Select(a => new
+            {
+                ProductName = a.Key,
+                ProductCount = a.Count(),
+                ProductTotalPrice = 
+                a.Sum(x=> x.Quantity * x.UnitPrice * (decimal)(1- x.Discount))
+
+            })
+                .OrderByDescending(x => x.ProductCount)
+                .Take(5)
+                .Sum(x=> x.ProductTotalPrice);
 
 
             return View();

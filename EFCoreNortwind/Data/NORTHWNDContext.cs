@@ -848,6 +848,17 @@ namespace EFCoreNortwind.Data
             OnModelCreatingPartial(modelBuilder);
         }
 
+        public override int SaveChanges()
+        {
+
+            foreach (var item in ChangeTracker.Entries())
+            {
+
+            }
+
+            return base.SaveChanges();
+        }
+
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
