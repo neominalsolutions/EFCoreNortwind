@@ -25,15 +25,15 @@ namespace EFCoreNortwind.Controllers
         public IActionResult Index()
         {
             // sorgu1
-            // en çok sipariş verilen 5 adet ürünü çekelim
+            // en çok sipariş verilen 5 adet ürünü çekelim ve kaç adet şipariş veridiğinide gösterelim
 
             //sorgu1
            // iki tablo birbiri ile çoka çok ilişkili ise ara tablo üzerinden diğer tabloya ulşamak için thenInclude yaparız.
            // 1'e  çok ilişki varsa yada 1'1 ilişki varsa Include yeterlidir.
-            var pro1 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(p => p.Product).SelectMany(u => u.OrderDetails).GroupBy(c => c.Product.ProductName).Select(y => new
+            var pro1 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(p => p.Product).SelectMany(u => u.OrderDetails).GroupBy(c => c.ProductId).Select(y => new
             {
-                ProductName = y.Key,
-                Quantity = y.Sum(z => z.Quantity)
+                ProductName = y.Key, // A
+                Quantity = y.Sum(z => z.Quantity) // 1200
             }).OrderByDescending(c => c.Quantity).Take(5).ToList();
 
             /*
@@ -61,13 +61,25 @@ order by adet desc
             // şimdiye kadar ne kadar ciro yaptık
 
             // sorgu6
-            // hangi müşteri kaç adet ürün sipariş etti
+            // hangi müşteri hangi üründen kaç adet sipariş etti
+            // çift alana göre group by işlemi
 
-            //var pro6 = _db.Orders.Include(x => x.OrderDetails).Include(x => x.Customer).GroupBy(x => x.CustomerId).Select(a => new
-            //{
-            //    quantity = a.Sum(y=> y.OrderDetails.Sum(g=> g.Quantity)),  // adet 1 geliyor
-            //    Customer = a.Key
-            //}).ToList();
+            var query6 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(x => x.Product).Include(x => x.Customer).SelectMany(y => y.OrderDetails).GroupBy(y => new { y.Order.CustomerId, y.Product.ProductName}).Select(a => new
+            {
+
+                Product = a.Key.ProductName,
+                Customer = a.Key.CustomerId,
+                TotalProductQuantity = a.Sum(x => x.Quantity)
+
+            }).OrderByDescending(x=> x.TotalProductQuantity).ToList();
+
+            // hangi müşteri hangi kaç adet ürün sipariş etti
+            var query61 = _db.Orders.Include(x => x.OrderDetails).ThenInclude(x => x.Product).Include(x => x.Customer).SelectMany(y => y.OrderDetails).GroupBy(y =>  y.Order.CustomerId).Select(a => new
+            {
+                Customer = a.Key,
+                TotalProductQuantity = a.Sum(x => x.Quantity)
+
+            }).OrderByDescending(x=> x.TotalProductQuantity).ToList();
 
             /*
              * 
@@ -98,6 +110,23 @@ inner  join Customers c on c.CustomerID = o.CustomerID
 
             // sorgu12
             // hangi çalışan kaç adet sipariş almış
+
+
+            var query12 = _db.Orders
+                .Include(x => x.Employee)
+                .GroupBy(x => new { x.Employee.FirstName, x.Employee.LastName }).Select(a => new
+                {
+                    EmployeeName = $"{a.Key.FirstName} {a.Key.LastName}",
+                    Count = a.Count()
+
+                }).ToList();
+
+            var qauery14 = _db.Orders.Include(x => x.Customer).Select(a => a.Customer.ContactName).ToList();
+            var qauery13 = _db.Orders.Select(a=> a.Customer.ContactName).ToList();
+            
+
+           
+
 
             // sorgu13
             // Hangi ürün hangi kategoride hangi tedarikçi tarafından getirilmiştir. KategoryAdı,UrunAdı,Fiyatı,Stoğu,Tedarikçi bilgileri ekrana getirilecek sorgu
