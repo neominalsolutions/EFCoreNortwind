@@ -18,6 +18,8 @@ namespace EFCoreNortwind.Data
         {
         }
 
+        public virtual DbSet<PagedProduct> PagedProducts { get; private set; }
+
         // view tabloymuş gibi DbSet ile tanımlıyoruz.
         public virtual DbSet<MostOrderedFiveProducts> MostOrderedFiveProducts { get; private set; }
         public virtual DbSet<Address> Addresses { get; set; }
@@ -67,6 +69,13 @@ namespace EFCoreNortwind.Data
         {
 
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            // Store Procedure Bağlama işlemi
+
+            modelBuilder.Entity<PagedProduct>(entity =>
+            {
+                entity.HasNoKey(); // entity değil
+            });
 
             // İkinci adım onModelCreating methodu içerisine bağlamak.
             modelBuilder.Entity<MostOrderedFiveProducts>(entity =>
@@ -165,6 +174,8 @@ namespace EFCoreNortwind.Data
 
             modelBuilder.Entity<Customer>(entity =>
             {
+                entity.HasKey(x => x.CustomerId);
+
                 entity.HasIndex(e => e.City, "City");
 
                 entity.HasIndex(e => e.CompanyName, "CompanyName");

@@ -1,6 +1,8 @@
 ﻿using EFCoreNortwind.Data;
+using EFCoreNortwind.Data.Dtos;
 using EFCoreNortwind.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -25,6 +27,41 @@ namespace EFCoreNortwind.Controllers
         public IActionResult ViewController()
         {
             var model = _db.MostOrderedFiveProducts.ToList();
+
+            return View(model);
+        }
+
+        public IActionResult StoreProcedure()
+        {
+            // FromSqlRaw bir sql komut tetikleyebiliriz.
+            //var model = _db.PagedProducts.FromSqlRaw($"PagedProducts {"'Liquids'"},{Convert.ToInt16(100)},{Convert.ToInt16(0)},{"'CategoryName'"},{"'Asc'"}").ToList();
+
+            //var searchText1 = new SqlParameter("@searchText", "Test");
+
+            //var searchText = new SqlParameter("@searchText", System.Data.SqlDbType.NVarChar,50);
+            //searchText.Value = "Liquids";
+
+            //var limit = new SqlParameter("@limit",System.Data.SqlDbType.Int);
+            //limit.Value = 100;
+
+            //var pageIndex = new SqlParameter("@pageIndex", System.Data.SqlDbType.Int);
+            //pageIndex.Value = 1;
+
+            //var sortColumn = new SqlParameter("@sortColumn", System.Data.SqlDbType.NVarChar,50);
+            //sortColumn.Value = "Category";
+            //var sortOrder = new SqlParameter("@sortOrder", System.Data.SqlDbType.NVarChar,4);
+            //sortOrder.Value = "ASC";
+
+            var @sqlParam = new PagedProductParams(
+                searchText: "Liquids",
+                sortColumn: "CategoryName",
+                sortOrder: SqlSortingTypes.Ascending,
+                pageIndex: 1,
+                limit: 10);
+
+            var model = _db.PagedProducts.FromSqlRaw("PagedProducts @searchText, @limit, @pageIndex, @sortColumn, @sortOrder",sqlParam.Params).ToList();
+
+
 
             return View(model);
         }
