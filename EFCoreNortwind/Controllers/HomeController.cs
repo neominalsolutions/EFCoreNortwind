@@ -31,37 +31,61 @@ namespace EFCoreNortwind.Controllers
             return View(model);
         }
 
+        public IActionResult EFTransaction()
+        {
+            // aşağıdaki örnekteki tüm işlemler birbirleri ile bağlantılı olarak düşünülerek hepsi tek bir transaction bloğunda gönderilmiştir.
+
+            var category1 = new Category
+            {
+                CategoryName = "Yeni 234"
+            };
+
+            category1.Products.Add(new Product
+            {
+                ProductName = "PYeni1",
+                CategoryId = category1.CategoryId,
+                Discontinued = false,
+                UnitPrice = 10,
+                UnitsInStock = 20,
+                SupplierId = null
+            });
+
+            category1.Products.Add(new Product
+            {
+                ProductName = "PYeni2",
+                CategoryId = category1.CategoryId,
+                Discontinued = true,
+                UnitPrice = 15,
+                UnitsInStock = 26,
+                SupplierId = null
+            });
+
+
+            _db.Categories.Add(category1); // Added
+
+            var category2 = new Category
+            {
+                CategoryName = "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+            };
+
+            _db.Categories.Add(category2);
+            _db.SaveChanges();
+
+            return View();
+
+        }
+
         public IActionResult StoreProcedure()
         {
-            // FromSqlRaw bir sql komut tetikleyebiliriz.
-            //var model = _db.PagedProducts.FromSqlRaw($"PagedProducts {"'Liquids'"},{Convert.ToInt16(100)},{Convert.ToInt16(0)},{"'CategoryName'"},{"'Asc'"}").ToList();
 
-            //var searchText1 = new SqlParameter("@searchText", "Test");
-
-            //var searchText = new SqlParameter("@searchText", System.Data.SqlDbType.NVarChar,50);
-            //searchText.Value = "Liquids";
-
-            //var limit = new SqlParameter("@limit",System.Data.SqlDbType.Int);
-            //limit.Value = 100;
-
-            //var pageIndex = new SqlParameter("@pageIndex", System.Data.SqlDbType.Int);
-            //pageIndex.Value = 1;
-
-            //var sortColumn = new SqlParameter("@sortColumn", System.Data.SqlDbType.NVarChar,50);
-            //sortColumn.Value = "Category";
-            //var sortOrder = new SqlParameter("@sortOrder", System.Data.SqlDbType.NVarChar,4);
-            //sortOrder.Value = "ASC";
-
-            var @sqlParam = new PagedProductParams(
-                searchText: "Liquids",
-                sortColumn: "CategoryName",
+            var sqlParam = new PagedProductParams(
+                searchText: "",
+                sortColumn: "ProductName",
                 sortOrder: SqlSortingTypes.Ascending,
-                pageIndex: 1,
+                pageIndex: 8,
                 limit: 10);
 
             var model = _db.PagedProducts.FromSqlRaw("PagedProducts @searchText, @limit, @pageIndex, @sortColumn, @sortOrder",sqlParam.Params).ToList();
-
-
 
             return View(model);
         }
