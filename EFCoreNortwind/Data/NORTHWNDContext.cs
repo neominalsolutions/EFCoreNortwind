@@ -1,4 +1,5 @@
 ﻿using System;
+using EFCoreNortwind.Data.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -17,6 +18,8 @@ namespace EFCoreNortwind.Data
         {
         }
 
+        // view tabloymuş gibi DbSet ile tanımlıyoruz.
+        public virtual DbSet<MostOrderedFiveProducts> MostOrderedFiveProducts { get; private set; }
         public virtual DbSet<Address> Addresses { get; set; }
         public virtual DbSet<AlphabeticalListOfProduct> AlphabeticalListOfProducts { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
@@ -62,7 +65,15 @@ namespace EFCoreNortwind.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            // İkinci adım onModelCreating methodu içerisine bağlamak.
+            modelBuilder.Entity<MostOrderedFiveProducts>(entity =>
+            {
+                entity.HasNoKey(); // Id alanı yoktur diyoruz.
+                entity.ToView("MostOrderedFiveProducts"); // View ismini veriyoruz
+            });
 
             modelBuilder.Entity<Address>(entity =>
             {
