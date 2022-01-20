@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCoreNortwind.Migrations
 {
     [DbContext(typeof(NORTHWNDContext))]
-    [Migration("20220120072742_MostOrderFiveProducts")]
-    partial class MostOrderFiveProducts
+    [Migration("20220120171808_MostOrderedFiveProductsView1")]
+    partial class MostOrderedFiveProductsView1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -285,7 +285,30 @@ namespace EFCoreNortwind.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.ToView("MostOrderedFiveProducts1");
+                    b.ToView("MostOrderedFiveProducts");
+                });
+
+            modelBuilder.Entity("EFCoreNortwind.Data.Dtos.PagedProduct", b =>
+                {
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<short>("Stock")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("SupplierCompany")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.ToTable("PagedProducts");
                 });
 
             modelBuilder.Entity("EFCoreNortwind.Data.Employee", b =>

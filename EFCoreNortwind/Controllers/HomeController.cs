@@ -37,12 +37,12 @@ namespace EFCoreNortwind.Controllers
 
             var category1 = new Category
             {
-                CategoryName = "Yeni 234"
+                CategoryName = "Yeni 6789"
             };
 
             category1.Products.Add(new Product
             {
-                ProductName = "PYeni1",
+                ProductName = "PYeni156",
                 CategoryId = category1.CategoryId,
                 Discontinued = false,
                 UnitPrice = 10,
@@ -52,7 +52,7 @@ namespace EFCoreNortwind.Controllers
 
             category1.Products.Add(new Product
             {
-                ProductName = "PYeni2",
+                ProductName = "PYeni2789",
                 CategoryId = category1.CategoryId,
                 Discontinued = true,
                 UnitPrice = 15,
@@ -62,6 +62,7 @@ namespace EFCoreNortwind.Controllers
 
 
             _db.Categories.Add(category1); // Added
+            _db.SaveChanges();
 
             var category2 = new Category
             {
@@ -85,20 +86,41 @@ namespace EFCoreNortwind.Controllers
                 pageIndex: 8,
                 limit: 10);
 
+           // var products = _db.Products.FromSqlRaw("select * from Products");
+
             var model = _db.PagedProducts.FromSqlRaw("PagedProducts @searchText, @limit, @pageIndex, @sortColumn, @sortOrder",sqlParam.Params).ToList();
+
+
+            /*
+             * 
+             * exec PagedProducts  
+             @searchText='Moz',
+             @limit=100,
+             @pageIndex=1,
+             @sortColumn='ProductName',
+             @sortOrder='Desc'
+             * 
+             */
 
             return View(model);
         }
 
         public IActionResult ChangeTrackerView()
         {
+            // select sorgularında list firstordefault işlemlerinden önce sorgunun daha perfomanslı çalışması için en sona tolist ve firstordeafutldan önce AsNoTracking ekleyelim. Böylelikle entityframew takip mekanizması oradan kalkar. sorgu daha hızlı çalışır. yüzde 50 yakın bir performans iyileştirmesi olur.
+
+            //var products = _db.Products.ToList();
+            //var products2 = _db.Products.AsNoTracking().ToList();
+
 
             //var qauery14 = _db.Orders.Include(x => x.Customer).Select(a => a.Customer.ContactName).ToList();
             //var qauery13 = _db.Orders.Select(a=> a.Customer.ContactName).ToList();
 
             // Include ve Select arasında yukarıdaki sorguda bir fark yoktur
 
-            //var product = _db.Products.AsNoTracking().FirstOrDefault(x => x.ProductId == 1);
+            //var product = _db.Products.Find(1);
+            // Not: Find asNoTracking() uygulanamaz
+            var product = _db.Products.AsNoTracking().FirstOrDefault(x=> x.ProductId == 1);
 
             /*_db.ChangeTracker.Entries();*/ // tüm entity ve state değişimlerini dizi olarak verir.
 
@@ -110,14 +132,19 @@ namespace EFCoreNortwind.Controllers
             //    }
             //}
 
-            //var state1 = _db.Entry(product).State;
+            // eğer product AsNoTracking ile detached olmuş ise attach methodu ile dbContext bağlıyoruz.
+            // 1. yöntem
+            // _db.Attach(product);
 
-            //product.UnitPrice = 32;
+            var state1 = _db.Entry(product).State;
 
-            //var state2 = _db.Entry(product).State;
+            product.UnitPrice = 36;
 
-            //_db.Products.Update(product);
-            //_db.SaveChanges();
+            var state2 = _db.Entry(product).State;
+
+            // 2. yöntem entity detached olsa bile bu method veriyi güncellerken attach yapar ef core ile gelen bir özellik ef 6 da yok
+            _db.Update(product);
+            _db.SaveChanges();
 
             //var state3 = _db.Entry(product).State;
 

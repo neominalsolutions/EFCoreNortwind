@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Migrations\20220120070120_MostOrderedFiveProducts.sql" />
+    <None Remove="Migrations\MostOrderedFiveProducts.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\20220120070120_MostOrderedFiveProducts.sql" />
+    <EmbeddedResource Include="Migrations\MostOrderedFiveProducts.sql" />
   </ItemGroup>
 
   <ItemGroup>
